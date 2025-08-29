@@ -16,7 +16,7 @@ __all__ = [
 def trajectory_shortest_distance(
     true: np.ndarray,
     pred: np.ndarray,
-    n_samples: int = 100,
+    n_samples: int = 1000,
     seed: Optional[int] = None,
 ) -> float:
     """Approximate shortest-average distance between two trajectories.
@@ -41,7 +41,7 @@ def compute_errors(
     true: np.ndarray,
     pred: np.ndarray,
     times: Optional[np.ndarray] = None,
-    traj_samples: int = 100,
+    traj_samples: int = 1000,
     seed: Optional[int] = None,
 ) -> Dict[str, np.ndarray]:
     """Compute MSE/NRMSE per-dimension and totals, trajectory distance, and divergence time.

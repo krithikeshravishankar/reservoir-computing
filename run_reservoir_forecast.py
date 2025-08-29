@@ -83,8 +83,45 @@ def build_reservoir(
     A_data = A_rand.toarray()
     A_data = A_data - 0.5 * np.sign(A_data)
     A_temp = sp.csr_matrix(A_data)
-    eigvals = sp.linalg.eigs(A_temp, k=1, which="LR", return_eigenvectors=False)
-    A_scaled = A_temp * (spectral_radius / np.abs(eigvals[0]))
+    # Estimate spectral radius (largest-magnitude eigenvalue) robustly
+    lam = None
+    try:
+        # Prefer largest magnitude (LM); allow more iterations and a looser tolerance
+        eigvals = sp.linalg.eigs(
+            A_temp, k=1, which="LM", return_eigenvectors=False, maxiter=20000, tol=1e-4
+        )
+        lam = float(np.abs(eigvals[0]))
+    except Exception:
+        lam = None
+
+    if lam is None or not np.isfinite(lam) or lam <= 0:
+        # Fallback 1: simple power iteration on the sparse matrix
+        v = rng.random(n) - 0.5
+        v_norm = np.linalg.norm(v)
+        if v_norm == 0:
+            v = np.ones(n)
+            v_norm = np.linalg.norm(v)
+        v /= v_norm
+        est = 0.0
+        for _ in range(300):
+            v = A_temp.dot(v)
+            v_norm = np.linalg.norm(v)
+            if v_norm == 0:
+                break
+            v /= v_norm
+            est = v_norm
+        lam = est if est > 0 else None
+
+    if lam is None or not np.isfinite(lam) or lam <= 0:
+        # Fallback 2: dense eigenvalue computation (feasible for typical n ~ 500)
+        try:
+            lam = float(np.max(np.abs(np.linalg.eigvals(A_temp.toarray()))))
+        except Exception:
+            lam = 1.0  # last-resort safe default to avoid division by zero
+
+    if lam <= 0 or not np.isfinite(lam):
+        lam = 1.0
+    A_scaled = A_temp * (spectral_radius / lam)
     Win = input_scale * (2.0 * rng.random((n, m)) - 1.0)
     return Reservoir(A=A_scaled.tocsr(), Win=Win, bias=bias)
 
