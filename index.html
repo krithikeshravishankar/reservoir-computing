@@ -3,12 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Browser tab content</title>
+    <title>My Interactive Page</title>
+    <style>
+        /* This is a CSS comment */
+        body {
+            background-color: #f0f8ff; /* A light aliceblue background */
+            font-family: sans-serif;
+            text-align: center; /* Center all the text inside the body */
+        }
+        h1 {
+            color: #4682b4; /* A nice steelblue color */
+        }
+        button {
+            background-color: #4682b4;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer; /* Changes the mouse to a pointer on hover */
+        }
+    </style>
 </head>
 <body>
 
     <h1>Hello, World!</h1>
     <p>This is my very first website.</p>
-
+    <button id="myButton">Click Me!</button>
+    <script>
+        // This is a JavaScript comment
+        const myButton = document.getElementById('myButton');
+    
+        myButton.addEventListener('click', function() {
+            alert('Hello from JavaScript!');
+        });
+    </script>
 </body>
 </html>
