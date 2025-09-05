@@ -26,15 +26,29 @@
 </head>
 <body>
 
-    <h1>Hello, World!</h1>
-    <p>This is my very first website.</p>
-    <button id="myButton">Click Me!</button>
+    <h1>My First Interactive App</h1>
+    <p>Enter some text below and submit it to the Python backend.</p>
+
+    <form action="/" method="POST">
+        <label for="user_text_input">Your Text:</label>
+        <input type="text" id="user_text_input" name="user_text" required>
+        <button type="submit">Submit to Python</button>
+    </form>
+
+    {# This is a Jinja2 comment. This block will only appear if the 'submitted_text' variable exists. #}
+    {% if submitted_text %}
+        <div style="margin-top: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+            <h2>Text Received by Python:</h2>
+            <p style="font-weight: bold; color: #0056b3;">{{ submitted_text }}</p>
+        </div>
+    {% endif %}
+
+    <hr style="margin-top: 30px;">
+    <p>The button below only uses JavaScript and does not talk to the Python backend.</p>
+    <button id="jsButton">Click for JS Alert</button>
     <script>
-        // This is a JavaScript comment
-        const myButton = document.getElementById('myButton');
-    
-        myButton.addEventListener('click', function() {
-            alert('Hello from JavaScript!');
+        document.getElementById('jsButton').addEventListener('click', function() {
+            alert('Hello from JavaScript! This did not involve the server.');
         });
     </script>
 </body>
