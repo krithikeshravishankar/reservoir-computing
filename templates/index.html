@@ -39,7 +39,9 @@
     {% if submitted_text %}
         <div style="margin-top: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
             <h2>Text Received by Python:</h2>
-            <p style="font-weight: bold; color: #0056b3;">{{ submitted_text }}</p>
+            <p style="font-style: italic;">"{{ submitted_text }}"</p>
+            <h3 style="margin-top: 15px;">Model Prediction:</h3>
+            <p style="font-weight: bold; color: #0056b3; font-size: 1.2em;">{{ prediction }}</p>
         </div>
     {% endif %}
 
