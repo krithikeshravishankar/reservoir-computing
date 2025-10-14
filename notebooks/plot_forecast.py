@@ -4,6 +4,10 @@ or with raw arrays (times, true, pred).
 """
 from __future__ import annotations
 
+import matplotlib
+# Set the backend to a non-interactive one before importing pyplot
+matplotlib.use('Agg')
+
 from typing import Dict, Optional, Union
 import numpy as np
 import matplotlib.pyplot as plt
@@ -66,23 +70,31 @@ def plot_error_over_time(
     plt.tight_layout()
 
 
-def _extract_forecast_inputs(results_or_forecast: Union[Dict, np.ndarray]):
-    if isinstance(results_or_forecast, dict) and "forecast" in results_or_forecast:
-        fc = results_or_forecast["forecast"]
-        return fc["times"], fc["true"], fc["pred"]
-    elif isinstance(results_or_forecast, dict) and {"times", "true", "pred"}.issubset(results_or_forecast.keys()):
-        return results_or_forecast["times"], results_or_forecast["true"], results_or_forecast["pred"]
-    else:
-        raise ValueError("Expected a results dict with 'forecast' or a forecast dict with keys times/true/pred")
+def save_plots_to_file(base_path: str, results: Dict) -> None:
+    """Generates and saves all standard plots to files. Does not return paths."""
+    fc = results["forecast"]
+    times, true, pred = fc["times"], fc["true"], fc["pred"]
 
+    # 3D Trajectory
+    fig = plt.figure(figsize=(5, 4))
+    ax = fig.add_subplot(111, projection="3d")
+    ax.plot(true[0], true[1], true[2], "r", lw=0.5, label="True")
+    ax.plot(pred[0], pred[1], pred[2], "g", lw=0.5, label="Predicted")
+    ax.set_xlabel("X"); ax.set_ylabel("Y"); ax.set_zlabel("Z")
+    ax.set_title("Forecast Trajectory")
+    ax.legend(); plt.tight_layout()
+    plt.savefig(f"{base_path}_3d.png")
+    plt.close(fig)
 
-def plot_all(
-    results_or_forecast: Union[Dict, np.ndarray],
-    from_time: float = 0.0,
-    to_time: Optional[float] = None,
-    error_plot: bool = True,
-) -> None:
-    times, true, pred = _extract_forecast_inputs(results_or_forecast)
-    plot_forecast(times, true, pred, from_time=from_time, to_time=to_time)
-    if error_plot:
-        plot_error_over_time(times, true, pred, from_time=from_time, to_time=to_time)
+    # Individual Components
+    paths_components = {}
+    components = ["X", "Y", "Z"]
+    for i in range(true.shape[0]):
+        fig = plt.figure(figsize=(6, 3))
+        plt.plot(times, true[i], "r", label="True")
+        plt.plot(times, pred[i], "b", label="Pred")
+        plt.xlabel("Time"); plt.ylabel(components[i])
+        plt.title(f"Forecast {components[i]}")
+        plt.legend(); plt.tight_layout()
+        plt.savefig(f"{base_path}_comp_{components[i].lower()}.png")
+        plt.close(fig)
